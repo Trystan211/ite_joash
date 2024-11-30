@@ -51,8 +51,8 @@ loader.load(
   'https://trystan211.github.io/ite_joash/mjolnir_thors_hammer.glb',
   (gltf) => {
     const mjolnir = gltf.scene;
-    mjolnir.position.set(mjolnirPosition.x, mjolnirPosition.y, mjolnirPosition.z); // Center position (adjust height to be above the ground)
-    mjolnir.scale.set(5, 5, 5); // Scale it down to fit the scene
+    mjolnir.position.set(mjolnirPosition.x, -1, mjolnirPosition.z); // Center position (adjust height to be above the ground)
+    mjolnir.scale.set(0.5, 0.5, 0.5); // Scale it down to fit the scene
     scene.add(mjolnir);
   },
   undefined,
