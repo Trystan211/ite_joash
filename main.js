@@ -12,8 +12,7 @@ camera.position.set(20, 10, 30);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true; // Enable shadows
-renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Soft shadows
+renderer.shadowMap.enabled = true; // Enable shadow map
 document.body.appendChild(renderer.domElement);
 
 // OrbitControls
@@ -27,7 +26,7 @@ const sand = new THREE.Mesh(
   new THREE.MeshStandardMaterial({ color: 0xd2b48c }) // Sandy color
 );
 sand.rotation.x = -Math.PI / 2;
-sand.receiveShadow = true; // Floor receives shadows
+sand.receiveShadow = true; // Receive shadows
 scene.add(sand);
 
 // Lights
@@ -47,12 +46,9 @@ loader.load(
   'https://trystan211.github.io/ite_joash/mjolnir_thors_hammer.glb',
   (gltf) => {
     const mjolnir = gltf.scene;
-
     mjolnir.position.set(mjolnirPosition.x, mjolnirPosition.y, mjolnirPosition.z);
     mjolnir.scale.set(0.01, 0.01, 0.01); // Scale appropriately for the scene
-    mjolnir.traverse((child) => {
-      if (child.isMesh) child.castShadow = true; // Mjolnir casts shadows
-    });
+    mjolnir.castShadow = true; // Cast shadows
     scene.add(mjolnir);
   },
   undefined,
@@ -71,8 +67,8 @@ for (let i = 0; i < 50; i++) {
     stoneMaterial
   );
   stone.position.set(x, 0.2, z);
-  stone.castShadow = true; // Stones cast shadows
-  stone.receiveShadow = true;
+  stone.castShadow = true; // Cast shadows
+  stone.receiveShadow = true; // Receive shadows
   scene.add(stone);
 }
 
@@ -92,12 +88,11 @@ for (let i = 0; i < 10; i++) {
     rockMaterial
   );
   tallRock.position.set(x, Math.random() * 2, z);
-  tallRock.castShadow = true; // Rocks cast shadows
-  tallRock.receiveShadow = true;
+  tallRock.castShadow = true; // Cast shadows
   scene.add(tallRock);
 }
 
-// Yellow-Orange Orbiting Particles
+// Yellow-Orange Orbiting Particles (First Group)
 const particleCount = 2000;
 const particlesGeometry = new THREE.BufferGeometry();
 const positions = [];
@@ -105,15 +100,15 @@ const velocities = [];
 
 for (let i = 0; i < particleCount; i++) {
   const angle = Math.random() * Math.PI * 2;
-  const distance = Math.random() * 30 + 10; // Wider influence area
+  const distance = Math.random() * 25 + 10;
   const y = Math.random() * 10 + 2;
 
   positions.push(
-    Math.cos(angle) * distance + mjolnirPosition.x, // X
-    y,                                              // Y
-    Math.sin(angle) * distance + mjolnirPosition.z  // Z
+    Math.cos(angle) * distance + mjolnirPosition.x,
+    y,
+    Math.sin(angle) * distance + mjolnirPosition.z
   );
-  velocities.push(0.006 * (Math.random() > 0.5 ? 1 : -1)); // Increased speed
+  velocities.push(0.004 * (Math.random() > 0.5 ? 1 : -1)); // Faster orbit
 }
 
 particlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
@@ -121,7 +116,7 @@ particlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(velo
 
 const particlesMaterial = new THREE.PointsMaterial({
   color: 0xffaa33,
-  size: 0.15, // Smaller particles
+  size: 0.1, // Smaller particles
   transparent: true,
   opacity: 0.8
 });
@@ -129,18 +124,30 @@ const particlesMaterial = new THREE.PointsMaterial({
 const particles = new THREE.Points(particlesGeometry, particlesMaterial);
 scene.add(particles);
 
-// Random Flickering Blue Lights
-const blueLights = [];
-for (let i = 0; i < 50; i++) {
-  const light = new THREE.PointLight(0x88ccff, 0, 10);
-  light.position.set(
-    Math.random() * 40 - 20,
-    Math.random() * 10 + 1,
-    Math.random() * 40 - 20
+// Additional Particle Group: Closer and Faster
+const closeParticleCount = 1000;
+const closeParticlesGeometry = new THREE.BufferGeometry();
+const closePositions = [];
+const closeVelocities = [];
+
+for (let i = 0; i < closeParticleCount; i++) {
+  const angle = Math.random() * Math.PI * 2;
+  const distance = Math.random() * 5 + 1;
+  const y = Math.random() * 4 + 1;
+
+  closePositions.push(
+    Math.cos(angle) * distance + mjolnirPosition.x,
+    y,
+    Math.sin(angle) * distance + mjolnirPosition.z
   );
-  scene.add(light);
-  blueLights.push(light);
+  closeVelocities.push(0.02 * (Math.random() > 0.5 ? 1 : -1)); // Much faster orbit
 }
+
+closeParticlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(closePositions, 3));
+closeParticlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(closeVelocities, 1));
+
+const closeParticles = new THREE.Points(particlesGeometry, particlesMaterial);
+scene.add(closeParticles);
 
 // Animation Loop
 const clock = new THREE.Clock();
@@ -148,29 +155,43 @@ const clock = new THREE.Clock();
 const animate = () => {
   const elapsedTime = clock.getElapsedTime();
 
-  // Update particles for orbiting motion
-  const positions = particlesGeometry.attributes.position.array;
-  const velocities = particlesGeometry.attributes.velocity.array;
+  // Update particles (First Group)
+  const positionsArray = particlesGeometry.attributes.position.array;
+  const velocitiesArray = particlesGeometry.attributes.velocity.array;
 
   for (let i = 0; i < particleCount; i++) {
     const xIndex = i * 3;
     const zIndex = xIndex + 2;
 
-    const x = positions[xIndex] - mjolnirPosition.x;
-    const z = positions[zIndex] - mjolnirPosition.z;
+    const x = positionsArray[xIndex] - mjolnirPosition.x;
+    const z = positionsArray[zIndex] - mjolnirPosition.z;
 
-    const angle = Math.atan2(z, x) + velocities[i];
+    const angle = Math.atan2(z, x) + velocitiesArray[i];
     const distance = Math.sqrt(x * x + z * z);
 
-    positions[xIndex] = Math.cos(angle) * distance + mjolnirPosition.x;
-    positions[zIndex] = Math.sin(angle) * distance + mjolnirPosition.z;
+    positionsArray[xIndex] = Math.cos(angle) * distance + mjolnirPosition.x;
+    positionsArray[zIndex] = Math.sin(angle) * distance + mjolnirPosition.z;
   }
   particlesGeometry.attributes.position.needsUpdate = true;
 
-  // Flickering lights
-  blueLights.forEach((light) => {
-    light.intensity = Math.random() > 0.8 ? Math.random() * 3 : 0;
-  });
+  // Update close particles
+  const closePositionsArray = closeParticlesGeometry.attributes.position.array;
+  const closeVelocitiesArray = closeParticlesGeometry.attributes.velocity.array;
+
+  for (let i = 0; i < closeParticleCount; i++) {
+    const xIndex = i * 3;
+    const zIndex = xIndex + 2;
+
+    const x = closePositionsArray[xIndex] - mjolnirPosition.x;
+    const z = closePositionsArray[zIndex] - mjolnirPosition.z;
+
+    const angle = Math.atan2(z, x) + closeVelocitiesArray[i];
+    const distance = Math.sqrt(x * x + z * z);
+
+    closePositionsArray[xIndex] = Math.cos(angle) * distance + mjolnirPosition.x;
+    closePositionsArray[zIndex] = Math.sin(angle) * distance + mjolnirPosition.z;
+  }
+  closeParticlesGeometry.attributes.position.needsUpdate = true;
 
   controls.update();
   renderer.render(scene, camera);
