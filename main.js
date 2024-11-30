@@ -1,4 +1,4 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.module.js';
+ Qimport * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.module.js';
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/jsm/loaders/GLTFLoader.js';
 
@@ -48,11 +48,11 @@ const loader = new GLTFLoader(); // Define the loader here
 let mjolnirPosition = { x: 0, y: 1, z: 0 }; // Mjolnir position
 
 loader.load(
-  'https://trystan211.github.io/ite_joash/thor_hammer_low_poly_free.glb',
+ 'https://trystan211.github.io/ite_joash/thor_hammer_low_poly_free.glb',
   (gltf) => {
     const mjolnir = gltf.scene;
     mjolnir.position.set(mjolnirPosition.x, -1, mjolnirPosition.z); // Center position (adjust height to be above the ground)
-    mjolnir.scale.set(0.5, 0.5, 0.5); // Scale it down to fit the scene
+    mjolnir.scale.set(0.01, 0.01, 0.01); // Scale it down drastically
     scene.add(mjolnir);
   },
   undefined,
