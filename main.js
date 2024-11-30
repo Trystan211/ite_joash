@@ -44,12 +44,15 @@ spotlight.angle = Math.PI / 4;
 scene.add(spotlight);
 
 // Load Mjolnir Model
+const loader = new GLTFLoader(); // Define the loader here
+let mjolnirPosition = { x: 0, y: 1, z: 0 }; // Mjolnir position
+
 loader.load(
   'https://trystan211.github.io/ite_joash/mjolnir_thors_hammer.glb',
   (gltf) => {
     const mjolnir = gltf.scene;
-    mjolnir.position.set(0, -1, 0); // Center position (adjust height to be above the ground)
-    mjolnir.scale.set(0.5, 0.5, 0.5); // Scale it down to fit the scene
+    mjolnir.position.set(mjolnirPosition.x, mjolnirPosition.y, mjolnirPosition.z); // Center position (adjust height to be above the ground)
+    mjolnir.scale.set(5, 5, 5); // Scale it down to fit the scene
     scene.add(mjolnir);
   },
   undefined,
@@ -180,3 +183,4 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
