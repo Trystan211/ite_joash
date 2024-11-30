@@ -125,7 +125,7 @@ const particles = new THREE.Points(particlesGeometry, particlesMaterial);
 scene.add(particles);
 
 // Additional Particle Group: Closer and Faster
-const closeParticleCount = 1000;
+const closeParticleCount = 2000;
 const closeParticlesGeometry = new THREE.BufferGeometry();
 const closePositions = [];
 const closeVelocities = [];
