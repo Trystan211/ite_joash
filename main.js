@@ -41,13 +41,13 @@ let mjolnirPosition = { x: 0, y: -0.5, z: 0 };
 
 // Load Mjolnir Model
 loader.load(
-  'https://trystan211.github.io/ite_joash/fox_stone_statue_handpainted_kitsune.glb',
+  'https://trystan211.github.io/ite_joash/thor_hammer_low_poly_free.glb',
   (gltf) => {
     const mjolnir = gltf.scene;
 
     // Set Mjolnir position to the center of the scene
     mjolnir.position.set(0, 1, 0); // Center position (adjust height to be above the ground)
-    mjolnir.scale.set(5, 5, 5); // Scale it down to fit the scene
+    mjolnir.scale.set(15,15, 15); // Scale it down to fit the scene
     scene.add(mjolnir);
   },
   undefined,
