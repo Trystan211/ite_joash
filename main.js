@@ -2,232 +2,175 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.m
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.152.0/examples/jsm/loaders/GLTFLoader.js';
 
-// Scene Setup ni don
+// Scene Setup
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000022); // Para ngit2
+scene.background = new THREE.Color(0x8b4513); // Dark yellow-orange
+scene.fog = new THREE.Fog(0x705d3d, 5, 40); // Yellowish fog, darker atmosphere
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(10, 10, 15);
+camera.position.set(20, 10, 30);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true;
 document.body.appendChild(renderer.domElement);
 
-// OrbitControls para sa camera movement
+// OrbitControls
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;  // Smooth damping
-controls.dampingFactor = 0.25;  // Speed sa damping
-controls.screenSpacePanning = false;  // Disable panning sa screen
+controls.enableDamping = true;
+controls.dampingFactor = 0.25;
 
-// Ground na snow sab // Pasensya kay flat ra
-const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(50, 50),
-  new THREE.MeshStandardMaterial({ color: 0x1a1a1a })
+// Sand Floor
+const sand = new THREE.Mesh(
+  new THREE.PlaneGeometry(60, 60),
+  new THREE.MeshStandardMaterial({ color: 0xd2b48c }) // Sandy color
 );
-ground.rotation.x = -Math.PI / 2;
-ground.receiveShadow = true;
-scene.add(ground);
+sand.rotation.x = -Math.PI / 2;
+scene.add(sand);
 
-// Fog ni
-scene.fog = new THREE.Fog(0xffffff, 10, 50); // Tae na white
-
-// Moonlight
-const moonLight = new THREE.DirectionalLight(0x6666ff, 0.4); 
-moonLight.position.set(10, 30, -10);
-moonLight.castShadow = true;
-scene.add(moonLight);
-
-// Ambient na light
-const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+// Lights
+const ambientLight = new THREE.AmbientLight(0xffcc88, 0.4);
 scene.add(ambientLight);
 
-// Snowman Model
-const loader = new GLTFLoader();
-let snowmanMixer = null;
-let snowman = null;
+const sunlight = new THREE.DirectionalLight(0xffaa66, 0.8);
+sunlight.position.set(10, 20, -5);
+scene.add(sunlight);
 
-const modelUrl = 'https://trystan211.github.io/test_lyndon/snowman.glb';
+// Load Mjolnir Model
+const loader = new GLTFLoader();
+let mjolnirPosition = { x: 0, y: -0.5, z: 0 };
 
 loader.load(
-  modelUrl,
+  'https://trystan211.github.io/test_joshua/mjolnir.glb',
   (gltf) => {
-    snowman = gltf.scene;
-    snowman.position.set(0, 0, 0);
-    snowman.scale.set(5, 5, 5);
-    scene.add(snowman);
+    const mjolnir = gltf.scene;
 
-    // Mag handle sa animations if available sa model
-    if (gltf.animations && gltf.animations.length > 0) {
-      snowmanMixer = new THREE.AnimationMixer(snowman);
-      const action = snowmanMixer.clipAction(gltf.animations[0]);
-      action.play();
-    }
+    mjolnir.position.set(mjolnirPosition.x, mjolnirPosition.y, mjolnirPosition.z);
+    mjolnir.scale.set(5, 5, 5); // Scale appropriately for the scene
+    scene.add(mjolnir);
   },
   undefined,
-  (error) => {
-    console.error('An error occurred while loading the snowman model:', error);
-  }
+  (error) => console.error('Error loading Mjolnir model:', error)
 );
 
-// Safe radius around sa snowman
-const safeRadius = 5; // Adjust as needed ni diri kung arte imong snowman
-const snowmanPosition = new THREE.Vector3(0, 0, 0); // Position sa snowman
-
-// Trees ni
-const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
-const leafMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
-
-for (let i = 0; i < 40; i++) {
-  let x, z;
-
-  // Regenerate positions hantud naa na sila gawas sa safe radius
-  do {
-    x = Math.random() * 40 - 20;
-    z = Math.random() * 40 - 20;
-  } while (snowmanPosition.distanceTo(new THREE.Vector3(x, 0, z)) < safeRadius);
-
-  const trunk = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.3, 0.5, 4, 16),
-    trunkMaterial
-  );
-  trunk.position.set(x, 2, z);
-  trunk.castShadow = true;
-
-  const foliage = new THREE.Mesh(
-    new THREE.ConeGeometry(2, 6, 16),
-    leafMaterial
-  );
-  foliage.position.set(x, 5, z);
-  foliage.castShadow = true;
-
-  scene.add(trunk);
-  scene.add(foliage);
-}
-
-// Mushrooms ni
-const mushroomCapMaterial = new THREE.MeshStandardMaterial({ emissive: 0xff2222 });
-const mushroomStemMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
+// Small Black Stones
+const stoneMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
 
 for (let i = 0; i < 50; i++) {
-  let x, z;
+  const x = Math.random() * 60 - 30;
+  const z = Math.random() * 60 - 30;
 
-  // Regenerate positions naa na sila sa gawas sa safe radius
-  do {
-    x = Math.random() * 40 - 20;
-    z = Math.random() * 40 - 20;
-  } while (snowmanPosition.distanceTo(new THREE.Vector3(x, 0, z)) < safeRadius);
-
-  const stem = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.1, 0.2, 0.5),
-    mushroomStemMaterial
+  const stone = new THREE.Mesh(
+    new THREE.SphereGeometry(Math.random() * 0.5, 16, 16),
+    stoneMaterial
   );
-  const cap = new THREE.Mesh(
-    new THREE.ConeGeometry(0.4, 0.3, 8),
-    mushroomCapMaterial
-  );
-  stem.position.set(x, 0.25, z);
-  cap.position.set(x, 0.55, z);
-
-  stem.castShadow = true;
-  cap.castShadow = true;
-
-  scene.add(stem);
-  scene.add(cap);
+  stone.position.set(x, 0.2, z);
+  scene.add(stone);
 }
 
-// Fireflies ni
-const fireflies = [];
-for (let i = 0; i < 15; i++) {
-  let x, y, z;
-
-  // Regenerate positions hantod naa na sila outside sa safe radius
-  do {
-    x = Math.random() * 40 - 20;
-    y = Math.random() * 5 + 1;
-    z = Math.random() * 40 - 20;
-  } while (snowmanPosition.distanceTo(new THREE.Vector3(x, 0, z)) < safeRadius);
-
-  const firefly = new THREE.PointLight(0xffff00, 2, 7);
-  firefly.position.set(x, y, z);
-  scene.add(firefly);
-
-  fireflies.push({
-    light: firefly,
-    velocity: new THREE.Vector3(
-      (Math.random() - 0.5) * 0.05,
-      (Math.random() - 0.5) * 0.05,
-      (Math.random() - 0.5) * 0.05
-    ),
-  });
-}
-
-// Snow Particles gamit ang BufferGeometry
-const snowParticles = new THREE.BufferGeometry();
-const snowMaterial = new THREE.PointsMaterial({
-  color: 0xffffff,
-  size: 0.1,
-  opacity: 0.8,
-  transparent: true,
+// Tall Pointy Rocks
+const rockMaterial = new THREE.MeshStandardMaterial({
+  color: 0x666666,
+  roughness: 0.9,
+  metalness: 0.1
 });
 
-const snowflakeCount = 5000;
-const positions = new Float32Array(snowflakeCount * 3); 
+for (let i = 0; i < 10; i++) {
+  const x = Math.random() * 50 - 25;
+  const z = Math.random() * 50 - 25;
 
-for (let i = 0; i < snowflakeCount; i++) {
-  positions[i * 3] = Math.random() * 50 - 25; // x position
-  positions[i * 3 + 1] = Math.random() * 30 + 5; // y position
-  positions[i * 3 + 2] = Math.random() * 50 - 25; // z position
+  const tallRock = new THREE.Mesh(
+    new THREE.ConeGeometry(Math.random() * 1 + 1, Math.random() * 10 + 5, 8),
+    rockMaterial
+  );
+  tallRock.position.set(x, Math.random() * 2, z);
+  scene.add(tallRock);
 }
 
-// Use BufferAttribute para ma store ang positions
-snowParticles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+// Yellow-Orange Orbiting Particles
+const particleCount = 1000;
+const particlesGeometry = new THREE.BufferGeometry();
+const positions = [];
+const velocities = []; // Angular velocities
 
-const snow = new THREE.Points(snowParticles, snowMaterial);
-scene.add(snow);
+for (let i = 0; i < particleCount; i++) {
+  const angle = Math.random() * Math.PI * 2; // Random starting angle
+  const distance = Math.random() * 15 + 5; // Distance from the center
+  const y = Math.random() * 10 + 2; // Height above the ground
 
-// Update ang snow particles para sa falling na effect
+  positions.push(
+    Math.cos(angle) * distance + mjolnirPosition.x, // X
+    y,                                              // Y
+    Math.sin(angle) * distance + mjolnirPosition.z  // Z
+  );
+  velocities.push(0.002 * (Math.random() > 0.5 ? 1 : -1)); // Random angular velocity
+}
+
+particlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+particlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(velocities, 1));
+
+const particlesMaterial = new THREE.PointsMaterial({
+  color: 0xffaa33, // Yellow-orange
+  size: 0.5,
+  transparent: true,
+  opacity: 0.8
+});
+
+const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+scene.add(particles);
+
+// Random Flickering Blue Lights
+const blueLights = [];
+const blueLightMaterial = new THREE.MeshStandardMaterial({ color: 0x88ccff });
+
+for (let i = 0; i < 10; i++) {
+  const light = new THREE.PointLight(0x88ccff, 0, 10);
+  light.position.set(
+    Math.random() * 40 - 20,
+    Math.random() * 10 + 1,
+    Math.random() * 40 - 20
+  );
+  scene.add(light);
+  blueLights.push(light);
+}
+
+// Animation Loop
 const clock = new THREE.Clock();
+
 const animate = () => {
   const elapsedTime = clock.getElapsedTime();
 
-  // Update ang positions sa snow particles
-  const positionsArray = snowParticles.attributes.position.array;
-  for (let i = 0; i < positionsArray.length; i += 3) {
-    positionsArray[i + 1] -= 0.05; // Nagpatagak sa snowflakes
+  // Update particles for orbiting motion
+  const positions = particlesGeometry.attributes.position.array;
+  const velocities = particlesGeometry.attributes.velocity.array;
 
-    if (positionsArray[i + 1] < 0) {
-      positionsArray[i + 1] = 30; // Nag reset pabalik sa taas
-    }
+  for (let i = 0; i < particleCount; i++) {
+    const xIndex = i * 3;
+    const zIndex = xIndex + 2;
+
+    const x = positions[xIndex] - mjolnirPosition.x;
+    const z = positions[zIndex] - mjolnirPosition.z;
+
+    const angle = Math.atan2(z, x) + velocities[i];
+    const distance = Math.sqrt(x * x + z * z);
+
+    positions[xIndex] = Math.cos(angle) * distance + mjolnirPosition.x;
+    positions[zIndex] = Math.sin(angle) * distance + mjolnirPosition.z;
   }
+  particlesGeometry.attributes.position.needsUpdate = true;
 
-  snowParticles.attributes.position.needsUpdate = true;
+  // Flickering lights
+  blueLights.forEach((light) => {
+    light.intensity = Math.random() > 0.8 ? Math.random() * 3 : 0; // Randomly flicker on and off
+  });
 
-  // Paglihok sa fireflies
-  for (let i = 0; i < fireflies.length; i++) {
-    const firefly = fireflies[i];
-    const position = firefly.light.position;
-    const velocity = firefly.velocity;
-
-    // Update ang position
-    position.add(velocity);
-
-    // Bounce back if ang firefly kay gusto mag deado sa kilid
-    if (position.x < -20 || position.x > 20) velocity.x *= -1;
-    if (position.y < 1 || position.y > 6) velocity.y *= -1;
-    if (position.z < -20 || position.z > 20) velocity.z *= -1;
-  }
-
-  // Update sa OrbitControls
-  controls.update(); // Only required if ang controls.enableDamping = true, or kung ang if controls.auto-rotation kay na enabled
-
+  controls.update();
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 };
 
 animate();
 
-// Handle window resize
+// Handle Window Resize
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
