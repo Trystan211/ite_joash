@@ -41,7 +41,7 @@ let mjolnirPosition = { x: 0, y: -0.5, z: 0 };
 
 // Load Mjolnir Model
 loader.load(
-  'https://trystan211.github.io/ite_joash/kitsune_fox_shrine_statue.glb',
+  'https://trystan211.github.io/ite_joash/fox_stone_statue_handpainted_kitsune.glb',
   (gltf) => {
     const mjolnir = gltf.scene;
 
