@@ -40,7 +40,7 @@ const loader = new GLTFLoader();
 let mjolnirPosition = { x: 0, y: -0.5, z: 0 };
 
 loader.load(
-  'https://trystan211.github.io/test_joshua/mjolnir.glb',
+  'https://trystan211.github.io/ite_joash/mjolnir_thors_hammer.glb',
   (gltf) => {
     const mjolnir = gltf.scene;
 
