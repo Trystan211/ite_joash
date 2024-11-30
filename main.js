@@ -38,18 +38,12 @@ sunlight.position.set(10, 20, -5);
 sunlight.castShadow = true; // Cast shadows
 scene.add(sunlight);
 
-// Mjolnir Position
-let mjolnirPosition = { x: 0, y: -0.5, z: 0 };
-
 // Flickering Light near Mjolnir
+const mjolnirPosition = { x: 0, y: -0.5, z: 0 };
 const flickeringLight = new THREE.PointLight(0xffcc33, 1.5, 10); // Warm yellow light
-flickeringLight.position.set(mjolnirPosition.x, mjolnirPosition.y + 3, mjolnirPosition.z);
+flickeringLight.position.set(mjolnirPosition.x, mjolnirPosition.y + 3, mjolnirPosition.z); // Hovering near Mjolnir
 flickeringLight.castShadow = true; // Light casting shadows
 scene.add(flickeringLight);
-
-// Flickering Light Variables
-let flickerCooldown = Math.random() * 2; // Random delay between flickers
-let flickerTimer = 0;
 
 // Load Mjolnir Model
 const loader = new GLTFLoader();
@@ -103,7 +97,7 @@ for (let i = 0; i < 10; i++) {
   scene.add(tallRock);
 }
 
-// Yellow-Orange Orbiting Particles (First Group)
+// Particle Group: Yellow-Orange Orbiting Particles
 const particleCount = 2000;
 const particlesGeometry = new THREE.BufferGeometry();
 const positions = [];
@@ -126,8 +120,8 @@ particlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(posi
 particlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(velocities, 1));
 
 const particlesMaterial = new THREE.PointsMaterial({
-  color: 0xffaa33,
-  size: 0.1, // Smaller particles
+  color: 0xffaa33, // Yellow-orange
+  size: 0.1,
   transparent: true,
   opacity: 0.8
 });
@@ -135,7 +129,7 @@ const particlesMaterial = new THREE.PointsMaterial({
 const particles = new THREE.Points(particlesGeometry, particlesMaterial);
 scene.add(particles);
 
-// Additional Particle Group: Closer and Faster
+// Closer Blue Particles
 const closeParticleCount = 2000;
 const closeParticlesGeometry = new THREE.BufferGeometry();
 const closePositions = [];
@@ -143,7 +137,7 @@ const closeVelocities = [];
 
 for (let i = 0; i < closeParticleCount; i++) {
   const angle = Math.random() * Math.PI * 2;
-  const distance = Math.random() * 5 + 1;
+  const distance = Math.random() * 8 + 3; // Adjust spread
   const y = Math.random() * 4 + 1;
 
   closePositions.push(
@@ -151,22 +145,28 @@ for (let i = 0; i < closeParticleCount; i++) {
     y,
     Math.sin(angle) * distance + mjolnirPosition.z
   );
-  closeVelocities.push(0.02 * (Math.random() > 0.5 ? 1 : -1)); // Much faster orbit
+  closeVelocities.push(0.02 * (Math.random() > 0.5 ? 1 : -1));
 }
 
 closeParticlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(closePositions, 3));
 closeParticlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(closeVelocities, 1));
 
-const closeParticles = new THREE.Points(closeParticlesGeometry, particlesMaterial);
+const closeParticlesMaterial = new THREE.PointsMaterial({
+  color: 0x3399ff, // Blue color
+  size: 0.15,
+  transparent: true,
+  opacity: 0.8
+});
+
+const closeParticles = new THREE.Points(closeParticlesGeometry, closeParticlesMaterial);
 scene.add(closeParticles);
 
 // Animation Loop
 const clock = new THREE.Clock();
+let flickerCooldown = Math.random() * 2;
+let flickerTimer = 0;
 
 const animate = () => {
-  const elapsedTime = clock.getElapsedTime();
-
-  // Flickering light logic
   flickerTimer += clock.getDelta();
   if (flickerTimer > flickerCooldown) {
     flickeringLight.intensity = Math.random() * 2.5;
@@ -174,7 +174,7 @@ const animate = () => {
     flickerTimer = 0;
   }
 
-  // Update particles (First Group)
+  // Update Yellow-Orange Particles
   const positionsArray = particlesGeometry.attributes.position.array;
   const velocitiesArray = particlesGeometry.attributes.velocity.array;
 
@@ -193,7 +193,7 @@ const animate = () => {
   }
   particlesGeometry.attributes.position.needsUpdate = true;
 
-  // Update close particles
+  // Update Closer Blue Particles
   const closePositionsArray = closeParticlesGeometry.attributes.position.array;
   const closeVelocitiesArray = closeParticlesGeometry.attributes.velocity.array;
 
