@@ -39,13 +39,15 @@ scene.add(sunlight);
 const loader = new GLTFLoader();
 let mjolnirPosition = { x: 0, y: -0.5, z: 0 };
 
+// Load Mjolnir Model
 loader.load(
   'https://trystan211.github.io/ite_joash/mjolnir_thors_hammer.glb',
   (gltf) => {
     const mjolnir = gltf.scene;
 
-    mjolnir.position.set(mjolnirPosition.x, mjolnirPosition.y, mjolnirPosition.z);
-    mjolnir.scale.set(100, 100, 100); // Scale appropriately for the scene
+    // Set Mjolnir position to the center of the scene
+    mjolnir.position.set(0, 1, 0); // Center position (adjust height to be above the ground)
+    mjolnir.scale.set(5, 5, 5); // Scale it down to fit the scene
     scene.add(mjolnir);
   },
   undefined,
