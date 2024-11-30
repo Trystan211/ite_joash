@@ -38,31 +38,21 @@ sunlight.position.set(10, 20, -5);
 sunlight.castShadow = true; // Cast shadows
 scene.add(sunlight);
 
+// Mjolnir Position
+let mjolnirPosition = { x: 0, y: -0.5, z: 0 };
+
 // Flickering Light near Mjolnir
 const flickeringLight = new THREE.PointLight(0xffcc33, 1.5, 10); // Warm yellow light
-flickeringLight.position.set(mjolnirPosition.x, mjolnirPosition.y + 3, mjolnirPosition.z); // Hovering near Mjolnir
+flickeringLight.position.set(mjolnirPosition.x, mjolnirPosition.y + 3, mjolnirPosition.z);
 flickeringLight.castShadow = true; // Light casting shadows
 scene.add(flickeringLight);
 
-// Flickering Light Animation
+// Flickering Light Variables
 let flickerCooldown = Math.random() * 2; // Random delay between flickers
 let flickerTimer = 0;
 
-const animate = () => {
-  const elapsedTime = clock.getElapsedTime();
-
-  // Sporadic flickering effect
-  flickerTimer += clock.getDelta(); // Increment timer
-  if (flickerTimer > flickerCooldown) {
-    flickeringLight.intensity = Math.random() * 2.5; // Random intensity between 0 and 2.5
-    flickerCooldown = Math.random() * 1.5 + 0.3; // New random delay between 0.3s and 1.8s
-    flickerTimer = 0; // Reset timer
-  }
-
 // Load Mjolnir Model
 const loader = new GLTFLoader();
-let mjolnirPosition = { x: 0, y: -0.5, z: 0 };
-
 loader.load(
   'https://trystan211.github.io/ite_joash/mjolnir_thors_hammer.glb',
   (gltf) => {
@@ -167,7 +157,7 @@ for (let i = 0; i < closeParticleCount; i++) {
 closeParticlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(closePositions, 3));
 closeParticlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(closeVelocities, 1));
 
-const closeParticles = new THREE.Points(particlesGeometry, particlesMaterial);
+const closeParticles = new THREE.Points(closeParticlesGeometry, particlesMaterial);
 scene.add(closeParticles);
 
 // Animation Loop
@@ -175,6 +165,14 @@ const clock = new THREE.Clock();
 
 const animate = () => {
   const elapsedTime = clock.getElapsedTime();
+
+  // Flickering light logic
+  flickerTimer += clock.getDelta();
+  if (flickerTimer > flickerCooldown) {
+    flickeringLight.intensity = Math.random() * 2.5;
+    flickerCooldown = Math.random() * 1.5 + 0.3;
+    flickerTimer = 0;
+  }
 
   // Update particles (First Group)
   const positionsArray = particlesGeometry.attributes.position.array;
