@@ -47,7 +47,7 @@ loader.load(
 
     // Set Mjolnir position to the center of the scene
     mjolnir.position.set(0, 1, 0); // Center position (adjust height to be above the ground)
-    mjolnir.scale.set(5,5, 5); // Scale it down to fit the scene
+    mjolnir.scale.set(1,1,1); // Scale it down to fit the scene
     scene.add(mjolnir);
   },
   undefined,
