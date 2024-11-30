@@ -124,16 +124,16 @@ const particlesMaterial = new THREE.PointsMaterial({
 const particles = new THREE.Points(particlesGeometry, particlesMaterial);
 scene.add(particles);
 
-// Additional Particle Group: Closer and Denser
-const closeParticleCount = 3000; // Increased number of particles
+// Additional Particle Group: Closer and Faster
+const closeParticleCount = 1000;
 const closeParticlesGeometry = new THREE.BufferGeometry();
 const closePositions = [];
 const closeVelocities = [];
 
 for (let i = 0; i < closeParticleCount; i++) {
   const angle = Math.random() * Math.PI * 2;
-  const distance = Math.random() * 2 + 0.5; // Much closer to Mjolnir
-  const y = Math.random() * 3 + 1;
+  const distance = Math.random() * 5 + 1;
+  const y = Math.random() * 4 + 1;
 
   closePositions.push(
     Math.cos(angle) * distance + mjolnirPosition.x,
@@ -146,7 +146,7 @@ for (let i = 0; i < closeParticleCount; i++) {
 closeParticlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(closePositions, 3));
 closeParticlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(closeVelocities, 1));
 
-const closeParticles = new THREE.Points(closeParticlesGeometry, particlesMaterial);
+const closeParticles = new THREE.Points(particlesGeometry, particlesMaterial);
 scene.add(closeParticles);
 
 // Animation Loop
@@ -206,3 +206,9 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
+
+
+
+
+
