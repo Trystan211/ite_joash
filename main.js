@@ -87,7 +87,7 @@ for (let i = 0; i < 10; i++) {
 }
 
 // Yellow-Orange Orbiting Particles
-const particleCount = 1000;
+const particleCount = 2000; // Increased particle count
 const particlesGeometry = new THREE.BufferGeometry();
 const positions = [];
 const velocities = []; // Angular velocities
@@ -110,7 +110,7 @@ particlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(velo
 
 const particlesMaterial = new THREE.PointsMaterial({
   color: 0xffaa33, // Yellow-orange
-  size: 0.5,
+  size: 0.25, // 2x smaller
   transparent: true,
   opacity: 0.8
 });
@@ -122,7 +122,7 @@ scene.add(particles);
 const blueLights = [];
 const blueLightMaterial = new THREE.MeshStandardMaterial({ color: 0x88ccff });
 
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 50; i++) { // Increased number of flickering lights
   const light = new THREE.PointLight(0x88ccff, 0, 10);
   light.position.set(
     Math.random() * 40 - 20,
@@ -176,3 +176,4 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
