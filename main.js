@@ -46,8 +46,8 @@ loader.load(
     const mjolnir = gltf.scene;
 
     // Set Mjolnir position to the center of the scene
-    mjolnir.position.set(0, 1, 0); // Center position (adjust height to be above the ground)
-    mjolnir.scale.set(1,1,1); // Scale it down to fit the scene
+    mjolnir.position.set(0, -2, 0); // Center position (adjust height to be above the ground)
+    mjolnir.scale.set(0.5,0.5,0.5); // Scale it down to fit the scene
     scene.add(mjolnir);
   },
   undefined,
