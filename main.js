@@ -129,33 +129,39 @@ const particlesMaterial = new THREE.PointsMaterial({
 const particles = new THREE.Points(particlesGeometry, particlesMaterial);
 scene.add(particles);
 
-// Closer Blue Particles
+// Closer Particles with Randomized Colors
 const closeParticleCount = 2000;
 const closeParticlesGeometry = new THREE.BufferGeometry();
 const closePositions = [];
 const closeVelocities = [];
+const possibleColors = [0xffffff, 0x3399ff, 0xd2b48c]; // White, Blue, Sand Yellow
+const colors = [];
 
 for (let i = 0; i < closeParticleCount; i++) {
   const angle = Math.random() * Math.PI * 2;
-  const distance = Math.random() * 8 + 3; // Adjust spread
-  const y = Math.random() * 4 + 1;
+  const distance = Math.random() * 25 + 10; // Match yellow-orange spread
+  const y = Math.random() * 10 + 2; // Match height range
 
   closePositions.push(
     Math.cos(angle) * distance + mjolnirPosition.x,
     y,
     Math.sin(angle) * distance + mjolnirPosition.z
   );
+
   closeVelocities.push(0.02 * (Math.random() > 0.5 ? 1 : -1));
+  const color = new THREE.Color(possibleColors[Math.floor(Math.random() * possibleColors.length)]);
+  colors.push(color.r, color.g, color.b); // RGB
 }
 
 closeParticlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(closePositions, 3));
 closeParticlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(closeVelocities, 1));
+closeParticlesGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
 const closeParticlesMaterial = new THREE.PointsMaterial({
-  color: 0x3399ff, // Blue color
   size: 0.15,
   transparent: true,
-  opacity: 0.8
+  opacity: 0.8,
+  vertexColors: true // Use vertex colors
 });
 
 const closeParticles = new THREE.Points(closeParticlesGeometry, closeParticlesMaterial);
@@ -163,13 +169,13 @@ scene.add(closeParticles);
 
 // Animation Loop
 const clock = new THREE.Clock();
-let flickerCooldown = Math.random() * 2;
+let flickerCooldown = Math.random() * 1.5 + 0.3;
 let flickerTimer = 0;
 
 const animate = () => {
   flickerTimer += clock.getDelta();
   if (flickerTimer > flickerCooldown) {
-    flickeringLight.intensity = Math.random() * 2.5;
+    flickeringLight.intensity = Math.random() * 2 + 0.5; // Ensure non-zero intensity
     flickerCooldown = Math.random() * 1.5 + 0.3;
     flickerTimer = 0;
   }
@@ -193,7 +199,7 @@ const animate = () => {
   }
   particlesGeometry.attributes.position.needsUpdate = true;
 
-  // Update Closer Blue Particles
+  // Update Closer Particles
   const closePositionsArray = closeParticlesGeometry.attributes.position.array;
   const closeVelocitiesArray = closeParticlesGeometry.attributes.velocity.array;
 
