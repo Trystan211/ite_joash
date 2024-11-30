@@ -45,7 +45,7 @@ loader.load(
     const mjolnir = gltf.scene;
 
     mjolnir.position.set(mjolnirPosition.x, mjolnirPosition.y, mjolnirPosition.z);
-    mjolnir.scale.set(5, 5, 5); // Scale appropriately for the scene
+    mjolnir.scale.set(100, 100, 100); // Scale appropriately for the scene
     scene.add(mjolnir);
   },
   undefined,
