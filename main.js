@@ -12,6 +12,8 @@ camera.position.set(20, 10, 30);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true; // Enable shadows
+renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Soft shadows
 document.body.appendChild(renderer.domElement);
 
 // OrbitControls
@@ -25,6 +27,7 @@ const sand = new THREE.Mesh(
   new THREE.MeshStandardMaterial({ color: 0xd2b48c }) // Sandy color
 );
 sand.rotation.x = -Math.PI / 2;
+sand.receiveShadow = true; // Floor receives shadows
 scene.add(sand);
 
 // Lights
@@ -33,6 +36,7 @@ scene.add(ambientLight);
 
 const sunlight = new THREE.DirectionalLight(0xffaa66, 0.8);
 sunlight.position.set(10, 20, -5);
+sunlight.castShadow = true; // Cast shadows
 scene.add(sunlight);
 
 // Load Mjolnir Model
@@ -46,6 +50,9 @@ loader.load(
 
     mjolnir.position.set(mjolnirPosition.x, mjolnirPosition.y, mjolnirPosition.z);
     mjolnir.scale.set(0.01, 0.01, 0.01); // Scale appropriately for the scene
+    mjolnir.traverse((child) => {
+      if (child.isMesh) child.castShadow = true; // Mjolnir casts shadows
+    });
     scene.add(mjolnir);
   },
   undefined,
@@ -64,6 +71,8 @@ for (let i = 0; i < 50; i++) {
     stoneMaterial
   );
   stone.position.set(x, 0.2, z);
+  stone.castShadow = true; // Stones cast shadows
+  stone.receiveShadow = true;
   scene.add(stone);
 }
 
@@ -83,34 +92,36 @@ for (let i = 0; i < 10; i++) {
     rockMaterial
   );
   tallRock.position.set(x, Math.random() * 2, z);
+  tallRock.castShadow = true; // Rocks cast shadows
+  tallRock.receiveShadow = true;
   scene.add(tallRock);
 }
 
 // Yellow-Orange Orbiting Particles
-const particleCount = 2000; // Increased particle count
+const particleCount = 2000;
 const particlesGeometry = new THREE.BufferGeometry();
 const positions = [];
-const velocities = []; // Angular velocities
+const velocities = [];
 
 for (let i = 0; i < particleCount; i++) {
-  const angle = Math.random() * Math.PI * 2; // Random starting angle
-  const distance = Math.random() * 15 + 5; // Distance from the center
-  const y = Math.random() * 10 + 2; // Height above the ground
+  const angle = Math.random() * Math.PI * 2;
+  const distance = Math.random() * 30 + 10; // Wider influence area
+  const y = Math.random() * 10 + 2;
 
   positions.push(
     Math.cos(angle) * distance + mjolnirPosition.x, // X
     y,                                              // Y
     Math.sin(angle) * distance + mjolnirPosition.z  // Z
   );
-  velocities.push(0.002 * (Math.random() > 0.5 ? 1 : -1)); // Random angular velocity
+  velocities.push(0.006 * (Math.random() > 0.5 ? 1 : -1)); // Increased speed
 }
 
 particlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
 particlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(velocities, 1));
 
 const particlesMaterial = new THREE.PointsMaterial({
-  color: 0xffaa33, // Yellow-orange
-  size: 0.25, // 2x smaller
+  color: 0xffaa33,
+  size: 0.15, // Smaller particles
   transparent: true,
   opacity: 0.8
 });
@@ -120,9 +131,7 @@ scene.add(particles);
 
 // Random Flickering Blue Lights
 const blueLights = [];
-const blueLightMaterial = new THREE.MeshStandardMaterial({ color: 0x88ccff });
-
-for (let i = 0; i < 50; i++) { // Increased number of flickering lights
+for (let i = 0; i < 50; i++) {
   const light = new THREE.PointLight(0x88ccff, 0, 10);
   light.position.set(
     Math.random() * 40 - 20,
@@ -160,7 +169,7 @@ const animate = () => {
 
   // Flickering lights
   blueLights.forEach((light) => {
-    light.intensity = Math.random() > 0.8 ? Math.random() * 3 : 0; // Randomly flicker on and off
+    light.intensity = Math.random() > 0.8 ? Math.random() * 3 : 0;
   });
 
   controls.update();
