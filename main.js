@@ -48,7 +48,7 @@ const loader = new GLTFLoader(); // Define the loader here
 let mjolnirPosition = { x: 0, y: 1, z: 0 }; // Mjolnir position
 
 loader.load(
-  'https://trystan211.github.io/ite_joash/mjolnir_thors_hammer.glb',
+  'https://trystan211.github.io/ite_joash/thor_hammer_low_poly_free.glb',
   (gltf) => {
     const mjolnir = gltf.scene;
     mjolnir.position.set(mjolnirPosition.x, -1, mjolnirPosition.z); // Center position (adjust height to be above the ground)
