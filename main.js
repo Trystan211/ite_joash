@@ -67,7 +67,11 @@ for (let i = 0; i < 50; i++) {
   scene.add(stone);
 }
 
-// Tall Pointy Rocks
+// Tall Pointy Rocks with Raycasting Support
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const tallRocks = []; // Store references to the pointy rocks
+
 const rockMaterial = new THREE.MeshStandardMaterial({
   color: 0x666666,
   roughness: 0.9,
@@ -80,12 +84,35 @@ for (let i = 0; i < 10; i++) {
 
   const tallRock = new THREE.Mesh(
     new THREE.ConeGeometry(Math.random() * 1 + 1, Math.random() * 10 + 5, 8),
-    rockMaterial
+    rockMaterial.clone() // Clone material for independent control
   );
   tallRock.position.set(x, Math.random() * 2, z);
-  tallRock.castShadow = true; // Enable shadows for tall rocks
+  tallRock.castShadow = true;
+  tallRocks.push(tallRock);
   scene.add(tallRock);
 }
+
+// Mouse Click Handler
+const handleClick = (event) => {
+  // Normalize mouse position
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+  // Update the raycaster
+  raycaster.setFromCamera(mouse, camera);
+
+  // Check for intersections
+  const intersects = raycaster.intersectObjects(tallRocks);
+
+  if (intersects.length > 0) {
+    const selectedRock = intersects[0].object;
+    selectedRock.material.color.set(0x444444); // Darker gray
+    selectedRock.scale.multiplyScalar(1.2); // Slightly larger
+  }
+};
+
+// Add Event Listeners
+window.addEventListener('click', handleClick);
 
 // Yellow-Orange Orbiting Particles
 const particleCount = 6000; // Number of particles
@@ -161,10 +188,8 @@ const animate = () => {
 
   // Flickering light effect with dynamic positions
   flickeringLights.forEach((light) => {
-    // Randomize intensity
     light.intensity = Math.random() * 8 + 4;
 
-    // Randomize position around Mjolnir
     const angle = Math.random() * Math.PI * 2;
     const radius = lightRadius * Math.random();
     light.position.set(
