@@ -159,9 +159,19 @@ const animate = () => {
   }
   particlesGeometry.attributes.position.needsUpdate = true;
 
-  // Flickering light effect
+  // Flickering light effect with dynamic positions
   flickeringLights.forEach((light) => {
-    light.intensity = Math.random() * 8 + 4; // Random brightness
+    // Randomize intensity
+    light.intensity = Math.random() * 8 + 4;
+
+    // Randomize position around Mjolnir
+    const angle = Math.random() * Math.PI * 2;
+    const radius = lightRadius * Math.random();
+    light.position.set(
+      mjolnirPosition.x + Math.cos(angle) * radius,
+      mjolnirPosition.y + 2 + Math.random() * 2,
+      mjolnirPosition.z + Math.sin(angle) * radius
+    );
   });
 
   controls.update();
