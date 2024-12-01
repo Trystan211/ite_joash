@@ -106,8 +106,20 @@ const handleClick = (event) => {
 
   if (intersects.length > 0) {
     const selectedRock = intersects[0].object;
+
+    // Store the original color and scale
+    const originalColor = selectedRock.material.color.clone();
+    const originalScale = selectedRock.scale.clone();
+
+    // Change color and size
     selectedRock.material.color.set(0x444444); // Darker gray
     selectedRock.scale.multiplyScalar(1.2); // Slightly larger
+
+    // Revert after 2 seconds
+    setTimeout(() => {
+      selectedRock.material.color.copy(originalColor);
+      selectedRock.scale.copy(originalScale);
+    }, 2000);
   }
 };
 
