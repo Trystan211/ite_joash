@@ -21,7 +21,7 @@ controls.dampingFactor = 0.25;
 
 // Sand Floor
 const sand = new THREE.Mesh(
-  new THREE.PlaneGeometry(60, 60), // Same size
+  new THREE.PlaneGeometry(60, 60),
   new THREE.MeshStandardMaterial({ color: 0xd2b48c }) // Sandy color
 );
 sand.rotation.x = -Math.PI / 2;
@@ -88,20 +88,20 @@ for (let i = 0; i < 10; i++) {
 }
 
 // Yellow-Orange Orbiting Particles
-const particleCount = 2000;
+const particleCount = 3000; // Increased number of particles
 const particlesGeometry = new THREE.BufferGeometry();
 const positions = [];
 const velocities = [];
 
 for (let i = 0; i < particleCount; i++) {
   const angle = Math.random() * Math.PI * 2;
-  const distance = Math.random() * 20 + 10; // Spread particles farther
-  const y = Math.random() * 12 + 2; // Higher above the ground
+  const distance = Math.random() * 15 + 5; // Closer orbit
+  const y = Math.random() * 12 + 2;
 
   positions.push(
-    Math.cos(angle) * distance + mjolnirPosition.x, // X
-    y,                                              // Y
-    Math.sin(angle) * distance + mjolnirPosition.z  // Z
+    Math.cos(angle) * distance + mjolnirPosition.x,
+    y,
+    Math.sin(angle) * distance + mjolnirPosition.z
   );
   velocities.push(0.002 * (Math.random() > 0.5 ? 1 : -1)); // Random angular velocity
 }
@@ -119,17 +119,28 @@ const particlesMaterial = new THREE.PointsMaterial({
 const particles = new THREE.Points(particlesGeometry, particlesMaterial);
 scene.add(particles);
 
-// Flickering Light near Mjolnir
-const flickeringLight = new THREE.PointLight(0xffcc33, 0, 20); // Initial intensity 0
-flickeringLight.position.set(mjolnirPosition.x, mjolnirPosition.y + 3, mjolnirPosition.z);
-scene.add(flickeringLight);
+// Multiple Flickering Lights around Mjolnir
+const flickeringLights = [];
+const lightCount = 20;
+const lightRadius = 10;
+
+for (let i = 0; i < lightCount; i++) {
+  const angle = (i / lightCount) * Math.PI * 2;
+  const x = mjolnirPosition.x + Math.cos(angle) * lightRadius;
+  const z = mjolnirPosition.z + Math.sin(angle) * lightRadius;
+  const y = mjolnirPosition.y + 2 + Math.random() * 2;
+
+  const light = new THREE.PointLight(0x33ccff, 0, 20); // Lightning blue
+  light.position.set(x, y, z);
+  scene.add(light);
+  flickeringLights.push(light);
+}
 
 // Animation Loop
 const clock = new THREE.Clock();
-let flickerCooldown = 0.05;
 
 const animate = () => {
-  // Update particles for orbiting motion
+  // Update particles
   const positions = particlesGeometry.attributes.position.array;
   const velocities = particlesGeometry.attributes.velocity.array;
 
@@ -149,11 +160,9 @@ const animate = () => {
   particlesGeometry.attributes.position.needsUpdate = true;
 
   // Flickering light effect
-  flickerCooldown -= clock.getDelta();
-  if (flickerCooldown <= 0) {
-    flickeringLight.intensity = Math.random() * 10 + 5; // Sporadic brightness
-    flickerCooldown = Math.random() * 0.2 + 0.05; // Random flicker delay
-  }
+  flickeringLights.forEach((light) => {
+    light.intensity = Math.random() * 12 + 8; // Random brightness
+  });
 
   controls.update();
   renderer.render(scene, camera);
@@ -168,3 +177,4 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
