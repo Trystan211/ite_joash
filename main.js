@@ -88,14 +88,14 @@ for (let i = 0; i < 10; i++) {
 }
 
 // Yellow-Orange Orbiting Particles
-const particleCount = 3000; // Increased number of particles
+const particleCount = 6000; // Increased number of particles
 const particlesGeometry = new THREE.BufferGeometry();
 const positions = [];
 const velocities = [];
 
 for (let i = 0; i < particleCount; i++) {
   const angle = Math.random() * Math.PI * 2;
-  const distance = Math.random() * 15 + 5; // Closer orbit
+  const distance = Math.random() * 40 + 10; // Wider orbit
   const y = Math.random() * 12 + 2;
 
   positions.push(
@@ -119,9 +119,9 @@ const particlesMaterial = new THREE.PointsMaterial({
 const particles = new THREE.Points(particlesGeometry, particlesMaterial);
 scene.add(particles);
 
-// Multiple Flickering Lights around Mjolnir
+// Reduced Flickering Lights around Mjolnir
 const flickeringLights = [];
-const lightCount = 20;
+const lightCount = 10; // Halved light count
 const lightRadius = 10;
 
 for (let i = 0; i < lightCount; i++) {
@@ -161,7 +161,7 @@ const animate = () => {
 
   // Flickering light effect
   flickeringLights.forEach((light) => {
-    light.intensity = Math.random() * 12 + 8; // Random brightness
+    light.intensity = Math.random() * 8 + 4; // Random brightness
   });
 
   controls.update();
